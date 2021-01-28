@@ -20,7 +20,7 @@ class Lead(models.Model):
     age = models.IntegerField(default=0)
     city = models.CharField(max_length=25, null=True)
     country = models.CharField(max_length=30, null=True)
-    email = models.CharField(max_length=50, null=True)
+    email = models.EmailField(max_length=50, null=True)
     agent = models.ForeignKey('Agent', on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=15, choices=lead_status, null=True)
     avatar = models.ImageField(null=True, upload_to='media')
@@ -35,3 +35,12 @@ class Agent(models.Model):
     
     def __str__(self):
         return self.user.username
+
+
+class LeadDetail(models.Model):
+    Lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
+    files = models.FileField(blank=True, upload_to='media')
+    tasks = models.TextField(max_length=1000)
+
+    def __str__(self):
+        return self.Lead.first_name

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from .models import User, Lead, Agent
+from .models import User, Lead, Agent, LeadDetail
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -71,12 +71,26 @@ def lead_delete(request, pk):
     lead.delete()
     return redirect('/leads')
 
+
+    ###################
+    #### Templates ####
+    ###################
+
+
+    
 def all(request):
-    lead_list = Lead.objects.all()
+    lead_list = Lead.objects.all() # returns Query set 
     return render(request, "leads.html", {'leads': lead_list})
 
 def eachlead(request, pk):
     # print(pk)
     lead = Lead.objects.get(id=pk)
-    print(lead.avatar)
-    return render(request, "onelead.html", {'lead': lead})
+    leadinfo = LeadDetail.objects.filter(Lead_id=lead).values() # returns JSON
+    # print(list(leadinfo)) 
+    return render(request, "onelead.html", {'lead': lead, 'leadinfo': leadinfo})
+
+
+def delete_lead(request, pk):
+    lead = Lead.objects.get(id=pk)
+    lead.delete()
+    return redirect('/all')
