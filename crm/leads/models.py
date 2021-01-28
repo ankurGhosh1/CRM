@@ -23,6 +23,7 @@ class Lead(models.Model):
     email = models.CharField(max_length=50, null=True)
     agent = models.ForeignKey('Agent', on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=15, choices=lead_status, null=True)
+    avatar = models.ImageField(null=True, upload_to='media')
 
     def __str__(self):
         return self.first_name

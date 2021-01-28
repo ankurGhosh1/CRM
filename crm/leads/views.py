@@ -7,6 +7,7 @@ import json
 from .serializers import LeadSerializer
 
 # Create your views here.
+
 def leads(request):
     lead_list = Lead.objects.all()
     serializer  = LeadSerializer(lead_list, many=True)
@@ -37,14 +38,14 @@ def newlead(request):
 
 @csrf_exempt
 def lead_details(request, pk):
-    print(pk)
+    # print(pk)
     lead = Lead.objects.get(id=pk)
     serializer = LeadSerializer(lead)
     return JsonResponse(serializer.data, safe = False)
 
 @csrf_exempt
 def lead_update(request, pk):
-    print(pk)
+    # print(pk)
     lead = Lead.objects.get(id=pk)
     if request.method == 'POST':
         first_name = request.POST['first_name']
@@ -69,3 +70,13 @@ def lead_delete(request, pk):
     lead = Lead.objects.get(id=pk)
     lead.delete()
     return redirect('/leads')
+
+def all(request):
+    lead_list = Lead.objects.all()
+    return render(request, "leads.html", {'leads': lead_list})
+
+def eachlead(request, pk):
+    # print(pk)
+    lead = Lead.objects.get(id=pk)
+    print(lead.avatar)
+    return render(request, "onelead.html", {'lead': lead})
