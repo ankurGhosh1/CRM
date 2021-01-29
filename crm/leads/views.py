@@ -5,6 +5,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .serializers import LeadSerializer
+from .forms import LeadForm, LeadDetailForm
 
 # Create your views here.
 
@@ -72,9 +73,10 @@ def lead_delete(request, pk):
     return redirect('/leads')
 
 
-    ###################
-    #### Templates ####
-    ###################
+    
+###################
+#### Templates ####
+###################
 
 
     
@@ -86,8 +88,37 @@ def eachlead(request, pk):
     # print(pk)
     lead = Lead.objects.get(id=pk)
     leadinfo = LeadDetail.objects.filter(Lead_id=lead).values() # returns JSON
+    print(lead.first_name)
     # print(list(leadinfo)) 
-    return render(request, "onelead.html", {'lead': lead, 'leadinfo': leadinfo})
+    form = LeadDetailForm()
+    if request.method == 'POST':
+        form = LeadDetailForm(request.POST, request.FILES)
+        # print(form.data)
+        if form.is_valid():
+            lead = lead.first_name
+            form.save()
+        return redirect('/all')
+    return render(request, "onelead.html", {'lead': lead, 'leadinfo': leadinfo, 'form': LeadDetailForm})
+
+def create_lead(request):
+    form = LeadForm()
+    if request.method == 'POST':
+        form = LeadForm(request.POST, request.FILES)
+        # print(form.data)
+        if form.is_valid():
+            form.save()
+        return redirect('/all')
+    return render(request, 'create.html', {'form': LeadForm})
+
+def update_lead(request, pk):
+    lead = Lead.objects.get(id=pk)
+    form = LeadForm(instance=lead)
+    if request.method == 'POST':
+        form = LeadForm(request.POST, request.FILES, instance=lead)
+        if form.is_valid():
+            form.save()
+            return redirect('/all')
+    return render(request, "leadupdate.html", {'lead': lead, 'form': LeadForm})
 
 
 def delete_lead(request, pk):
