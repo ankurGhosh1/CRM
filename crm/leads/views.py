@@ -1,14 +1,23 @@
-from django.shortcuts import render, redirect
+import json
+from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, JsonResponse
-from .models import User, Lead, Agent, LeadDetail
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
-import json
+from django.views import generic
+
 from .serializers import LeadSerializer
 from .forms import LeadForm, LeadDetailForm
+from .models import User, Lead, Agent, LeadDetail
+
 
 # Create your views here.
 
+#######################
+#### Json Response ####
+#######################
+
+
+@csrf_exempt
 def leads(request):
     lead_list = Lead.objects.all()
     serializer  = LeadSerializer(lead_list, many=True)
@@ -73,16 +82,94 @@ def lead_delete(request, pk):
     return redirect('/leads')
 
 
-    
+
 ###################
 #### Templates ####
 ###################
 
 
-    
+
+###################  
+### Class Views ###
+###################
+
+### List View
+
+class LeadList(generic.ListView):
+    template_name = "leads.html"
+    queryset = Lead.objects.all()
+    # print(queryset)
+    context_object_name = "leads" ### It is used to change name the template will take. If changed HTML variable needs to be changed. Default name "object_list"
+  
+### Detail View      
+
+class LeadDetailView(generic.DetailView, generic.CreateView):
+    template_name = "onelead.html"
+    queryset = Lead.objects.all()
+    form_class = LeadDetailForm
+
+    context_object_name = "lead"
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        user = self.kwargs.get('pk') # returns partucular user
+        context['leadinfo'] = LeadDetail.objects.filter(Lead_id=user)
+        return context
+
+    def get_success_url(self):
+        # return "/all"
+        return reverse("leads:all")
+
+### Create View
+
+class LeadCreateView(generic.CreateView):
+    template_name = "create.html"
+    # queryset = Lead.objects.all()
+    form_class = LeadForm
+    context_object_name = "lead"
+
+    def get_success_url(self):
+        # return "/all"
+        return reverse("leads:all")
+
+
+### Update View
+
+class LeadUpdateView(generic.UpdateView):
+    template_name = "leadupdate.html"
+    queryset = Lead.objects.all()
+    form_class = LeadForm
+    context_object_name = "lead"
+
+    def get_success_url(self):
+        # return "/all"
+        return reverse("leads:all")
+
+
+### Delete View
+
+class LeadDeleteView(generic.DeleteView):
+    template_name = 'delete.html'
+    queryset = Lead.objects.all()
+
+    def get_success_url(self):
+        # return "/all"
+        return reverse("leads:all")
+
+######################  
+### Function Views ###
+######################
+
+
+### List View
+
 def all(request):
     lead_list = Lead.objects.all() # returns Query set 
     return render(request, "leads.html", {'leads': lead_list})
+
+### Detail View
 
 def eachlead(request, pk):
     # print(pk)
@@ -100,6 +187,8 @@ def eachlead(request, pk):
         return redirect('/all')
     return render(request, "onelead.html", {'lead': lead, 'leadinfo': leadinfo, 'form': LeadDetailForm})
 
+### Create View
+
 def create_lead(request):
     form = LeadForm()
     if request.method == 'POST':
@@ -109,6 +198,9 @@ def create_lead(request):
             form.save()
         return redirect('/all')
     return render(request, 'create.html', {'form': LeadForm})
+
+
+### Update View
 
 def update_lead(request, pk):
     lead = Lead.objects.get(id=pk)
@@ -120,6 +212,7 @@ def update_lead(request, pk):
             return redirect('/all')
     return render(request, "leadupdate.html", {'lead': lead, 'form': LeadForm})
 
+### Delete View
 
 def delete_lead(request, pk):
     lead = Lead.objects.get(id=pk)
