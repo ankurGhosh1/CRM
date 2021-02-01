@@ -4,9 +4,10 @@ from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views import generic
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .serializers import LeadSerializer
-from .forms import LeadForm, LeadDetailForm
+from .forms import LeadForm, LeadDetailForm, CustomUserCreationForm
 from .models import User, Lead, Agent, LeadDetail
 
 
@@ -95,7 +96,7 @@ def lead_delete(request, pk):
 
 ### List View
 
-class LeadList(generic.ListView):
+class LeadList(LoginRequiredMixin, generic.ListView):
     template_name = "leads.html"
     queryset = Lead.objects.all()
     # print(queryset)
@@ -103,7 +104,7 @@ class LeadList(generic.ListView):
   
 ### Detail View      
 
-class LeadDetailView(generic.DetailView, generic.CreateView):
+class LeadDetailView(LoginRequiredMixin, generic.DetailView, generic.CreateView):
     template_name = "onelead.html"
     queryset = Lead.objects.all()
     form_class = LeadDetailForm
@@ -124,7 +125,7 @@ class LeadDetailView(generic.DetailView, generic.CreateView):
 
 ### Create View
 
-class LeadCreateView(generic.CreateView):
+class LeadCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = "create.html"
     # queryset = Lead.objects.all()
     form_class = LeadForm
@@ -137,7 +138,7 @@ class LeadCreateView(generic.CreateView):
 
 ### Update View
 
-class LeadUpdateView(generic.UpdateView):
+class LeadUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = "leadupdate.html"
     queryset = Lead.objects.all()
     form_class = LeadForm
@@ -150,13 +151,28 @@ class LeadUpdateView(generic.UpdateView):
 
 ### Delete View
 
-class LeadDeleteView(generic.DeleteView):
+class LeadDeleteView(LoginRequiredMixin, generic.DeleteView):
     template_name = 'delete.html'
     queryset = Lead.objects.all()
 
     def get_success_url(self):
         # return "/all"
         return reverse("leads:all")
+
+
+### Signup View
+
+class SignupView(generic.CreateView):
+    template_name = "registration/signup.html"
+    # queryset = Lead.objects.all()
+    form_class = CustomUserCreationForm
+    context_object_name = "lead"
+
+    def get_success_url(self):
+        # return "/all"
+        return reverse("leads:login")
+
+
 
 ######################  
 ### Function Views ###

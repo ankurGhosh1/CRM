@@ -2,9 +2,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.auth.views import LoginView, LogoutView
 
 from . import views
-from .views import LeadList, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView
+from .views import LeadList, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView, SignupView
 
 app_name = 'leads'
 
@@ -35,4 +36,7 @@ urlpatterns = [
     path('lead/<int:pk>/update', LeadUpdateView.as_view(), name="update_lead"),
     path('lead/<int:pk>/delete', LeadDeleteView.as_view(), name="delete_lead"),
     path('create-lead/', LeadCreateView.as_view(), name="create-lead"),
+    path('login/', LoginView.as_view(), name="login"),
+    path('logout/', LogoutView.as_view(), name="logout"),
+    path('signup', SignupView.as_view(), name="signup")
 ]

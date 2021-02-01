@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{% url 'agents:agents-create' %}">Create Agent</a>
+{% for agent in object_list %}
+      <div class="flex items-center lg:w-3/5 mx-auto border-b pb-10 mb-10 border-gray-800 sm:flex-row flex-col">
+        <div class="sm:w-32 sm:h-32 h-20 w-20 sm:mr-10 inline-flex items-center justify-center rounded-full text-indigo-400 bg-gray-800 flex-shrink-0">
+            <img src="" alt=""/>
+        </div>
+        <div class="flex-grow sm:text-left text-center mt-6 sm:mt-0">
+            <a href="">
+                <h2 class="text-black text-lg title-font font-medium mb-2">{{agent.user.username}} {{agent.user.last_name}}</h2>
+                <p class="leading-relaxed text-base">Blue bottle crucifix vinyl post-ironic four dollar toast vegan taxidermy. Gastropub indxgo juice poutine.</p>
+            </a>
+        </div>
+      </div>
+{% endfor %}
+
+{% endblock %}

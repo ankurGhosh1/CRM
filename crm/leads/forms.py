@@ -1,6 +1,6 @@
 from django import forms
-from .models import Lead, LeadDetail
-
+from .models import Lead, LeadDetail, User
+from django.contrib.auth.forms import UserCreationForm, UsernameField
 
 # class LeadForm(forms.Form):
 #     first_name = forms.CharField(max_length=50)
@@ -35,3 +35,10 @@ class LeadDetailForm(forms.ModelForm):
 #     'status',
 #     'avatar',
 # )
+
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username',)
+        field_classes = {'username': UsernameField}

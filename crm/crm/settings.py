@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'leads',
+    'agents',
 ]
 
 MIDDLEWARE = [
@@ -127,5 +128,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 AUTH_USER_MODEL = 'leads.User'
+
+LOGIN_REDIRECT_URL = '/all'
+LOGIN_URL = '/login'
+LOGOUT_REDIRECT_URL = '/'
 
 mimetypes.add_type("text/css", ".css", True)
