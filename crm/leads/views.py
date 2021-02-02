@@ -98,7 +98,15 @@ def lead_delete(request, pk):
 
 class LeadList(LoginRequiredMixin, generic.ListView):
     template_name = "leads.html"
-    queryset = Lead.objects.all()
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_company:
+            queryset = Lead.objects.filter(company=user.userprofile)
+        else:
+            queryset = Lead.objects.filter(company=user.agent.company)
+            queryset = queryset.filter(agent__user=user)
+        return queryset
     # print(queryset)
     context_object_name = "leads" ### It is used to change name the template will take. If changed HTML variable needs to be changed. Default name "object_list"
   
@@ -106,10 +114,19 @@ class LeadList(LoginRequiredMixin, generic.ListView):
 
 class LeadDetailView(LoginRequiredMixin, generic.DetailView, generic.CreateView):
     template_name = "onelead.html"
-    queryset = Lead.objects.all()
     form_class = LeadDetailForm
 
     context_object_name = "lead"
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_company:
+            queryset = Lead.objects.filter(company=user.userprofile)
+        else:
+            queryset = Lead.objects.filter(company=user.agent.company)
+            queryset = queryset.filter(agent__user=user)
+        return queryset
+
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context

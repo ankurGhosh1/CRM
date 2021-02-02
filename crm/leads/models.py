@@ -4,7 +4,9 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class User(AbstractUser):
-    pass
+    is_company = models.BooleanField(default=True)
+    is_agent = models.BooleanField(default=False)
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -28,13 +30,13 @@ class Lead(models.Model):
     city = models.CharField(max_length=25, null=True)
     country = models.CharField(max_length=30, null=True)
     email = models.EmailField(max_length=50, null=True)
-    agent = models.ForeignKey('Agent', on_delete=models.CASCADE, null=True)
+    agent = models.ForeignKey('Agent', on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=False)
     status = models.CharField(max_length=15, choices=lead_status, null=True)
     avatar = models.ImageField(null=True, upload_to='media')
 
     def __str__(self):
         return self.first_name
-
 
 
 class Agent(models.Model):
